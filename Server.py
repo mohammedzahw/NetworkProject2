@@ -9,14 +9,7 @@ print("Server is listening on port 8000")
 
 
 # *****************************************************************
-class User:
-    def __init__(self, name, client, address):
-        self.name = name
-        self.client = client
-        self.address = address
 
-    def send(self, message):
-        self.client.send(message)
 
 
 # *****************************************************************
@@ -62,7 +55,7 @@ class Chat:
 
 
 # *****************************************************************
-users = []
+users = {}
 groups = []
 chats = []
 
@@ -160,10 +153,9 @@ def recv(client):
                     except:
                         print("session closed")
                 chat.add_message(f"{sender} >> {msgcontent[3]}")
-            elif msgcontent[0] == "name":
+            elif msgcontent[0] == "user_name":
                 name = msgcontent[1]
-                user = User(name, client, addr)
-                users.append(user)
+                users[name] = name
                 get_connected_users(client)
         except Exception as e:
             print("error", e)
@@ -177,16 +169,12 @@ def get_groups(client):
 
 def get_connected_users(client):
     for user in users:
-        users_names = [user.name for user in users]
+        users_names = [key for key in users]
+        print("users", users)
         print("users_names", users_names)
         client.send(("users," + ",".join(users_names)).encode("utf-8"))
 
-
-def create_usert(name, client, addr):
-    user = User(name, client, addr)
-    users.append(user)
-    get_connected_users(client)
-    return user
+# *****************************************************************
 
 
 while True:
